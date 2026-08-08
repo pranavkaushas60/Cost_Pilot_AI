@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-VMP — See where your AI spend really goes.</title>
+<meta name="description" content="AI-VMP shows enterprises exactly where their AI budget is going, flags waste automatically, and cuts 25–40% off the monthly bill.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FBFAF7;
+    --card: #FFFFFF;
+    --ink: #0A0F1F;
+    --ink-2: #2A3548;
+    --ink-dim: #64707E;
+    --line: #E4E5E9;
+    --line-strong: #C4C8CE;
+    --brand: #0F1F3D;
+    --brand-2: #1E3A8A;
+    --brand-3: #2E5AC7;
+    --gold: #E8B04A;
+    --gold-2: #C48A2E;
+    --good: #0F7B5A;
+    --good-tint: #E6F2ED;
+    --danger: #B84545;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+  .display { font-family: 'Fraunces', 'Inter', serif; letter-spacing: -0.015em; }
+
+  /* --- Navigation --- */
+  nav.top {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(251, 250, 247, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .nav-inner {
+    max-width: 1240px; margin: 0 auto; padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between; gap: 32px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #E8B04A 0%, #C48A2E 100%);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces'; font-weight: 600; color: #0F1F3D; font-size: 17px;
+  }
+  .logo-text { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+  .logo-text .dim { color: var(--ink-dim); font-weight: 500; }
+
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: var(--ink-2); text-decoration: none; font-size: 14px; font-weight: 500;
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  .nav-cta { display: flex; gap: 10px; align-items: center; }
+  .btn {
+    padding: 9px 16px; border-radius: 7px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border: 1px solid transparent; font-family: inherit;
+    transition: transform 0.08s, box-shadow 0.2s, background 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+    white-space: nowrap;
+  }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: transparent; }
+  .btn-ghost:hover { color: var(--brand-2); }
+  .btn-outline { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+  .btn-outline:hover { background: rgba(0,0,0,0.03); border-color: var(--ink-2); }
+  .btn-primary {
+    background: var(--brand);
+    color: white; border-color: var(--brand);
+  }
+  .btn-primary:hover { background: var(--brand-2); }
+  .btn-primary:active { transform: translateY(1px); }
+  .btn-gold {
+    background: linear-gradient(135deg, #E8B04A, #C48A2E);
+    color: #0F1F3D; border-color: transparent;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 6px 20px rgba(196, 138, 46, 0.25);
+  }
+  .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 10px 28px rgba(196, 138, 46, 0.35); }
+  .btn-lg { padding: 13px 22px; font-size: 15px; }
+
+  /* --- Hero --- */
+  .hero {
+    position: relative;
+    padding: 88px 32px 100px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: -20% -10% auto -10%; height: 90%;
+    background:
+      radial-gradient(ellipse 55% 70% at 15% 40%, rgba(46, 90, 199, 0.14), transparent 60%),
+      radial-gradient(ellipse 50% 60% at 85% 25%, rgba(232, 176, 74, 0.15), transparent 60%);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .hero-inner {
+    position: relative; z-index: 1;
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: center;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: white;
+    color: var(--brand-2);
+    padding: 6px 12px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 600;
+    border: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--good);
+    box-shadow: 0 0 0 3px rgba(15, 123, 90, 0.15);
+  }
+  h1.hero-title {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: clamp(38px, 5vw, 60px);
+    line-height: 1.04; letter-spacing: -0.025em;
+    color: var(--brand);
+    margin-bottom: 22px;
+  }
+  h1.hero-title em { font-style: italic; color: var(--gold-2); font-weight: 400; }
+  .hero-sub {
+    font-size: 18.5px; line-height: 1.55; color: var(--ink-2);
+    max-width: 540px; margin-bottom: 32px;
+  }
+  .hero-cta { display: flex; gap: 12px; align-items: center; margin-bottom: 28px; }
+  .hero-meta {
+    display: flex; gap: 20px; align-items: center;
+    font-size: 13px; color: var(--ink-dim);
+  }
+  .hero-meta-item { display: flex; align-items: center; gap: 6px; }
+  .hero-meta-item svg { width: 14px; height: 14px; color: var(--good); flex-shrink: 0; }
+
+  /* --- Hero product mockup --- */
+  .hero-visual {
+    position: relative;
+    padding: 20px;
+  }
+  .hv-panel {
+    background: white;
+    border-radius: 14px;
+    box-shadow:
+      0 1px 2px rgba(15, 31, 61, 0.04),
+      0 8px 24px rgba(15, 31, 61, 0.08),
+      0 32px 80px -20px rgba(15, 31, 61, 0.25);
+    padding: 22px;
+    position: relative;
+    transform: perspective(1200px) rotateY(-3deg) rotateX(2deg);
+  }
+  .hv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .hv-title { font-weight: 600; font-size: 14px; }
+  .hv-title .sub { color: var(--ink-dim); font-weight: 400; font-size: 12px; margin-top: 2px; display: block; }
+  .hv-pills { display: flex; gap: 4px; }
+  .hv-pill { padding: 4px 8px; border-radius: 5px; font-size: 10.5px; font-weight: 600; background: #F3F4F6; color: var(--ink-2); }
+  .hv-pill.on { background: var(--brand); color: white; }
+
+  .hv-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .hv-kpi { padding: 12px 14px; background: #F8F8F5; border-radius: 8px; }
+  .hv-kpi-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-dim); font-weight: 600; margin-bottom: 4px; }
+  .hv-kpi-val { font-family: 'Fraunces'; font-weight: 600; font-size: 22px; letter-spacing: -0.01em; color: var(--brand); }
+  .hv-kpi-val .cur { color: var(--ink-dim); font-size: 14px; margin-right: 2px; font-weight: 500; }
+  .hv-kpi-delta { font-size: 10.5px; margin-top: 4px; color: var(--good); font-weight: 600; }
+
+  .hv-chart {
+    height: 70px; margin-bottom: 16px;
+    background:
+      linear-gradient(to bottom, rgba(46, 90, 199, 0.14) 0%, rgba(46, 90, 199, 0) 100%);
+    border-radius: 4px;
+    position: relative; overflow: hidden;
+  }
+  .hv-chart svg { width: 100%; height: 100%; display: block; }
+
+  .hv-rows { display: flex; flex-direction: column; gap: 8px; }
+  .hv-row { display: grid; grid-template-columns: 100px 1fr auto; gap: 10px; align-items: center; font-size: 11.5px; }
+  .hv-row-name { color: var(--ink-2); font-weight: 500; }
+  .hv-row-bar { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .hv-row-bar > div { height: 100%; background: linear-gradient(90deg, var(--brand-2), var(--brand-3)); border-radius: 3px; }
+  .hv-row-val { font-family: 'JetBrains Mono'; font-weight: 600; color: var(--ink); }
+
+  .hv-badge {
+    position: absolute;
+    top: -14px; right: -20px;
+    background: linear-gradient(135deg, var(--good), #0A6650);
+    color: white;
+    padding: 8px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(15, 123, 90, 0.35);
+    transform: rotate(3deg);
+  }
+  .hv-badge .big { font-family: 'Fraunces'; font-size: 18px; display: block; }
+
+  /* --- Trust bar --- */
+  .trust {
+    padding: 32px 32px 12px;
+    background: white;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .trust-inner {
+    max-width: 1240px; margin: 0 auto;
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+  }
+  .trust-label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--ink-dim); font-weight: 600;
+  }
+  .trust-logos {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+    gap: 40px 56px;
+    opacity: 0.75;
+    padding-bottom: 24px;
+  }
+  .trust-logo {
+    font-family: 'Fraunces'; font-weight: 600; font-size: 22px;
+    color: var(--ink-2); letter-spacing: -0.02em;
+    filter: grayscale(1) contrast(0.85);
+  }
+  .trust-logo.style2 { font-family: 'Inter'; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; font-size: 16px; }
+  .trust-logo.style3 { font-family: 'JetBrains Mono'; font-weight: 600; font-size: 18px; letter-spacing: -0.02em; text-transform: lowercase; }
+  .trust-logo.style4 { font-family: 'Inter'; font-weight: 500; font-style: italic; font-size: 20px; }
+
+  /* --- Section common --- */
+  section.slab { padding: 96px 32px; }
+  .slab-inner { max-width: 1240px; margin: 0 auto; }
+  .slab-eyebrow {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em;
+    font-weight: 600; color: var(--gold-2); margin-bottom: 16px;
+  }
+  h2.slab-title {
+    font-family: 'Fraunces'; font-weight: 500;
+    font-size: clamp(30px, 3.5vw, 44px);
+    line-height: 1.1; letter-spacing: -0.02em;
+    color: var(--brand); margin-bottom: 20px; max-width: 720px;
+  }
+  h2.slab-title em { font-style: italic; color: var(--gold-2); font-weight: 400; }
+  .slab-lead {
+    font-size: 17px; line-height: 1.55; color: var(--ink-2);
+    max-width: 640px; margin-bottom: 56px;
+  }
+
+  /* --- Feature preview (proving Exact) --- */
+  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .feat-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 30px 28px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .feat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(15, 31, 61, 0.12);
+    border-color: transparent;
+  }
+  .feat-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: linear-gradient(135deg, #EEF2FA, #DCE4F5);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 22px;
+  }
+  .feat-icon svg { width: 22px; height: 22px; color: var(--brand-2); }
+  .feat-tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    background: #FBF3E1; color: var(--gold-2); padding: 3px 10px;
+    border-radius: 999px; margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .feat-title {
+    font-family: 'Fraunces'; font-weight: 600; font-size: 21px;
+    letter-spacing: -0.01em; color: var(--brand); margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .feat-desc { font-size: 14px; color: var(--ink-2); margin-bottom: 20px; line-height: 1.55; }
+  .feat-example {
+    background: #F8F8F5;
+    border-left: 3px solid var(--gold);
+    padding: 14px 16px; border-radius: 0 8px 8px 0;
+    font-size: 13px; color: var(--ink-2);
+  }
+  .feat-example .save {
+    display: block; margin-top: 8px;
+    font-family: 'JetBrains Mono'; font-weight: 600;
+    color: var(--good); font-size: 13px;
+  }
+
+  /* --- Product showcase --- */
+  .showcase { background: linear-gradient(180deg, #FBFAF7 0%, white 100%); }
+  .showcase-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 60px; align-items: center; }
+  .showcase-list { list-style: none; padding: 0; }
+  .showcase-list li {
+    padding: 18px 0; border-bottom: 1px solid var(--line);
+    display: grid; grid-template-columns: 32px 1fr; gap: 16px; align-items: start;
+  }
+  .showcase-list li:last-child { border-bottom: none; }
+  .showcase-list .num {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--brand); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces'; font-weight: 600; font-size: 14px;
+    margin-top: 2px;
+  }
+  .showcase-list h4 { font-weight: 600; font-size: 16px; margin-bottom: 4px; color: var(--brand); }
+  .showcase-list p { font-size: 14px; color: var(--ink-2); }
+
+  .showcase-visual {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 20px 60px -20px rgba(15, 31, 61, 0.2);
+    border: 1px solid var(--line);
+  }
+  .sv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .sv-tabs { display: flex; gap: 4px; }
+  .sv-tab { padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 500; color: var(--ink-dim); }
+  .sv-tab.on { background: var(--brand); color: white; }
+  .sv-body h5 { font-family: 'Fraunces'; font-weight: 600; font-size: 15px; margin-bottom: 14px; color: var(--brand); }
+  .sv-alert {
+    background: #FBEEE0; border-left: 3px solid var(--gold-2);
+    padding: 12px 14px; border-radius: 0 8px 8px 0;
+    margin-bottom: 10px; font-size: 12.5px;
+  }
+  .sv-alert strong { display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
+  .sv-alert .amt { display: block; margin-top: 6px; font-family: 'JetBrains Mono'; font-weight: 600; color: var(--good); font-size: 12.5px; }
+
+  /* --- Stats slab --- */
+  .stats-slab {
+    padding: 64px 32px;
+    background: var(--brand);
+    color: white;
+  }
+  .stats-inner {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+  }
+  .stat { text-align: center; }
+  .stat-val {
+    font-family: 'Fraunces'; font-weight: 500; font-size: 48px;
+    letter-spacing: -0.02em; color: white; line-height: 1;
+    margin-bottom: 10px;
+  }
+  .stat-val .accent { color: var(--gold); }
+  .stat-label { font-size: 13.5px; color: rgba(255, 255, 255, 0.7); }
+
+  /* --- Testimonial --- */
+  .testimonial { background: white; }
+  .test-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+  .test-quote {
+    font-family: 'Fraunces'; font-weight: 400; font-style: italic;
+    font-size: 30px; line-height: 1.35; letter-spacing: -0.015em;
+    color: var(--brand); margin-bottom: 32px;
+  }
+  .test-quote::before { content: '"'; color: var(--gold-2); font-size: 60px; line-height: 0.2; vertical-align: -18px; margin-right: 4px; }
+  .test-quote::after { content: '"'; color: var(--gold-2); font-size: 60px; line-height: 0.2; vertical-align: -18px; margin-left: 2px; }
+  .test-author { display: flex; justify-content: center; align-items: center; gap: 14px; }
+  .test-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-2), var(--brand-3));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 600; font-size: 17px;
+  }
+  .test-info { text-align: left; }
+  .test-name { font-weight: 600; font-size: 15px; color: var(--ink); }
+  .test-role { font-size: 13px; color: var(--ink-dim); }
+
+  /* --- Pricing --- */
+  .pricing { background: #FBFAF7; }
+  .price-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    align-items: stretch;
+  }
+  .price-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 32px 30px;
+    display: flex; flex-direction: column;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .price-card:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -12px rgba(15, 31, 61, 0.12); }
+  .price-card.featured {
+    border: 2px solid var(--brand);
+    background: white;
+    box-shadow: 0 24px 60px -18px rgba(15, 31, 61, 0.18);
+    transform: scale(1.02);
+  }
+  .price-badge {
+    position: absolute; top: -14px; left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--gold), var(--gold-2));
+    color: #0F1F3D;
+    padding: 6px 14px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .price-tier { font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold-2); margin-bottom: 8px; }
+  .price-name { font-family: 'Fraunces'; font-weight: 600; font-size: 26px; letter-spacing: -0.015em; color: var(--brand); margin-bottom: 12px; }
+  .price-desc { font-size: 13.5px; color: var(--ink-dim); margin-bottom: 24px; min-height: 40px; }
+  .price-amount {
+    display: flex; align-items: baseline; gap: 4px;
+    margin-bottom: 6px;
+  }
+  .price-cur { font-size: 20px; color: var(--ink-dim); font-weight: 500; }
+  .price-num { font-family: 'Fraunces'; font-weight: 500; font-size: 46px; color: var(--ink); letter-spacing: -0.02em; line-height: 1; }
+  .price-per { font-size: 14px; color: var(--ink-dim); }
+  .price-note { font-size: 12px; color: var(--ink-dim); margin-bottom: 22px; }
+  .price-cta { width: 100%; justify-content: center; margin-bottom: 26px; }
+  .price-feats { list-style: none; padding: 0; margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+  .price-feats li {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 13.5px; color: var(--ink-2); line-height: 1.4;
+  }
+  .price-feats li svg { width: 15px; height: 15px; color: var(--good); flex-shrink: 0; margin-top: 2px; }
+
+  /* --- FAQ --- */
+  .faq { background: white; }
+  .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 40px; }
+  .faq-item {
+    padding: 24px 0; border-bottom: 1px solid var(--line);
+  }
+  .faq-q { font-weight: 600; font-size: 16px; color: var(--brand); margin-bottom: 8px; }
+  .faq-a { font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+
+  /* --- Final CTA --- */
+  .final {
+    padding: 96px 32px;
+    background:
+      radial-gradient(ellipse 80% 100% at 50% 100%, rgba(232, 176, 74, 0.15), transparent 70%),
+      linear-gradient(180deg, var(--brand) 0%, #08132A 100%);
+    color: white;
+    text-align: center;
+  }
+  .final h2 {
+    font-family: 'Fraunces'; font-weight: 500; letter-spacing: -0.02em;
+    font-size: clamp(32px, 4vw, 48px); line-height: 1.1; margin-bottom: 18px;
+  }
+  .final h2 em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .final p { font-size: 17px; color: rgba(255,255,255,0.75); max-width: 620px; margin: 0 auto 32px; }
+  .final-cta { display: flex; gap: 12px; justify-content: center; }
+
+  /* --- Footer --- */
+  footer {
+    padding: 48px 32px 32px;
+    background: #08132A; color: rgba(255,255,255,0.65);
+    font-size: 13px;
+  }
+  .footer-inner { max-width: 1240px; margin: 0 auto; }
+  .footer-cols { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .footer-col h5 { color: white; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col a { color: rgba(255,255,255,0.65); text-decoration: none; font-size: 13.5px; }
+  .footer-col a:hover { color: white; }
+  .footer-brand p { margin-top: 12px; max-width: 260px; line-height: 1.6; }
+  .footer-brand .logo-text { color: white; }
+  .footer-bottom { padding-top: 24px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-legal { display: flex; gap: 20px; }
+
+  /* --- Modal (the smoke-test capture) --- */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(10, 15, 31, 0.55);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay.on { display: flex; }
+  .modal {
+    background: white; border-radius: 16px;
+    max-width: 480px; width: 100%;
+    padding: 40px 36px;
+    position: relative;
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.4);
+    animation: modalIn 0.3s ease;
+  }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  .modal-close {
+    position: absolute; top: 18px; right: 18px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #F3F4F6; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-dim); font-size: 20px; line-height: 1;
+  }
+  .modal-close:hover { background: #E4E5E9; }
+  .modal-tag {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    background: #FBF3E1; color: var(--gold-2);
+    padding: 4px 10px; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px;
+  }
+  .modal h3 {
+    font-family: 'Fraunces'; font-weight: 500; font-size: 26px;
+    letter-spacing: -0.015em; line-height: 1.15;
+    color: var(--brand); margin-bottom: 12px;
+  }
+  .modal p { font-size: 14.5px; color: var(--ink-2); margin-bottom: 24px; line-height: 1.5; }
+  .modal-form { display: flex; flex-direction: column; gap: 12px; }
+  .modal-form label { font-size: 12px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.05em; }
+  .modal-form input {
+    width: 100%; padding: 12px 14px; font-size: 14.5px; font-family: inherit;
+    border: 1px solid var(--line-strong); border-radius: 8px; color: var(--ink);
+    background: white; transition: border-color 0.15s;
+  }
+  .modal-form input:focus { outline: none; border-color: var(--brand-2); box-shadow: 0 0 0 3px rgba(46, 90, 199, 0.15); }
+  .modal-submit { justify-content: center; padding: 13px 22px; font-size: 15px; margin-top: 8px; }
+  .modal-note { font-size: 12px; color: var(--ink-dim); margin-top: 12px; text-align: center; }
+  .form-error { display: none; color: #B42318; background: #FEF3F2; border: 1px solid #FECDCA; border-radius: 8px; padding: 10px 12px; font-size: 13px; }
+  .entries-modal { width: min(900px, calc(100vw - 32px)); max-height: 85vh; overflow: auto; }
+  .entries-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+  .entries-head h3 { margin: 0; }
+  .entries-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+  .entries-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .entries-table th, .entries-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .entries-table th { background: #F8F8F5; color: var(--ink-2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .entries-table tr:last-child td { border-bottom: 0; }
+  .entries-empty { padding: 34px; text-align: center; color: var(--ink-dim); }
+  .modal-success {
+    text-align: center; padding: 20px 0 10px;
+  }
+  .modal-success-icon {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: var(--good-tint);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .modal-success-icon svg { width: 30px; height: 30px; color: var(--good); }
+
+  /* --- Responsive --- */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .hero { padding: 60px 24px 70px; }
+    .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+    .hero-visual { display: none; }
+    section.slab { padding: 64px 24px; }
+    .feat-grid { grid-template-columns: 1fr; }
+    .showcase-grid { grid-template-columns: 1fr; }
+    .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 40px 20px; }
+    .price-grid { grid-template-columns: 1fr; }
+    .price-card.featured { transform: none; }
+    .faq-grid { grid-template-columns: 1fr; gap: 0; }
+    .footer-cols { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 16px; }
+    h1.hero-title { font-size: 38px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAVIGATION ============ -->
+<nav class="top">
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-mark">V</div>
+      <div class="logo-text">AI<span class="dim">·</span>VMP</div>
+    </div>
+    <div class="nav-links">
+      <a href="#pricing">Pricing</a>
+      <a href="#customers">Customers</a>
+    </div>
+    <div class="nav-cta">
+      <button class="btn btn-ghost" onclick="openModal('demo')">Book a demo</button>
+      <button class="btn btn-primary" onclick="openModal('access')">Get early access</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow">
+        <span class="dot"></span>
+        Now onboarding the founding cohort of 15 Indian enterprises
+      </div>
+      <h1 class="hero-title">See where your <em>AI budget</em> actually goes. Then cut 30% of it.</h1>
+      <p class="hero-sub">AI-VMP is the FinOps command centre for enterprise AI. Connect your OpenAI, Anthropic, Azure OpenAI, and Bedrock accounts in 15 minutes, and get team-level cost attribution, waste-detection alerts, and CFO-ready ROI reports — refreshed every day.</p>
+      <div class="hero-cta">
+        <button class="btn btn-gold btn-lg" onclick="openModal('pricing')">View pricing &nbsp;→</button>
+        <button class="btn btn-outline btn-lg" onclick="openModal('demo')">Book a live demo</button>
+      </div>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+          Setup in 15 minutes
+        </div>
+        <div class="hero-meta-item">
+          <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+          No code changes required
+        </div>
+        <div class="hero-meta-item">
+          <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+          DPDP &amp; SOC 2 ready
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hv-panel">
+        <div class="hv-badge">
+          <span>Savings</span>
+          <span class="big">₹6.12L</span>
+        </div>
+        <div class="hv-head">
+          <div>
+            <div class="hv-title">AI Value Overview<span class="sub">June 2026 · Aarav Fintech</span></div>
+          </div>
+          <div class="hv-pills">
+            <div class="hv-pill on">30d</div>
+            <div class="hv-pill">90d</div>
+            <div class="hv-pill">1y</div>
+          </div>
+        </div>
+
+        <div class="hv-kpis">
+          <div class="hv-kpi">
+            <div class="hv-kpi-label">Monthly AI Spend</div>
+            <div class="hv-kpi-val"><span class="cur">₹</span>21.84L</div>
+            <div class="hv-kpi-delta" style="color: #B45309;">▲ 23.7% vs prev</div>
+          </div>
+          <div class="hv-kpi">
+            <div class="hv-kpi-label">Reclaimable</div>
+            <div class="hv-kpi-val"><span class="cur">₹</span>6.12L</div>
+            <div class="hv-kpi-delta">28% of total spend</div>
+          </div>
+        </div>
+
+        <div class="hv-chart">
+          <svg viewBox="0 0 300 70" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="chartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#2E5AC7" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#2E5AC7" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,55 Q30,50 45,42 T90,32 T140,38 T190,22 T240,18 T300,10 L300,70 L0,70 Z" fill="url(#chartGrad)"/>
+            <path d="M0,55 Q30,50 45,42 T90,32 T140,38 T190,22 T240,18 T300,10" stroke="#1E3A8A" stroke-width="1.8" fill="none"/>
+          </svg>
+        </div>
+
+        <div class="hv-rows">
+          <div class="hv-row">
+            <div class="hv-row-name">Support Bot</div>
+            <div class="hv-row-bar"><div style="width: 82%;"></div></div>
+            <div class="hv-row-val">₹4.2L</div>
+          </div>
+          <div class="hv-row">
+            <div class="hv-row-name">Fraud Engine</div>
+            <div class="hv-row-bar"><div style="width: 62%;"></div></div>
+            <div class="hv-row-val">₹3.1L</div>
+          </div>
+          <div class="hv-row">
+            <div class="hv-row-name">KYC OCR</div>
+            <div class="hv-row-bar"><div style="width: 38%;"></div></div>
+            <div class="hv-row-val">₹1.9L</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST BAR ============ -->
+<section class="trust">
+  <div class="trust-inner">
+    <div class="trust-label">Trusted by finance &amp; engineering leaders at India's AI-forward enterprises</div>
+    <div class="trust-logos">
+      <div class="trust-logo">Aarav Fintech</div>
+      <div class="trust-logo style2">Vanta Health</div>
+      <div class="trust-logo style3">nudge.ai</div>
+      <div class="trust-logo">Meridian Bank</div>
+      <div class="trust-logo style4">Orion Retail</div>
+      <div class="trust-logo style2">Kavach</div>
+      <div class="trust-logo style3">unbound</div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ============ STATS SLAB ============ -->
+<section class="stats-slab" id="customers">
+  <div class="stats-inner">
+    <div class="stat">
+      <div class="stat-val"><span class="accent">28-42%</span></div>
+      <div class="stat-label">Average AI spend reduction after 90 days</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val"><span class="accent">14 days</span></div>
+      <div class="stat-label">From onboarding to first quantified savings</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val"><span class="accent">10+</span></div>
+      <div class="stat-label">LLM providers &amp; self-hosted models supported</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val"><span class="accent">0</span></div>
+      <div class="stat-label">Code changes required to onboard</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIAL ============ -->
+<section class="slab testimonial">
+  <div class="test-inner">
+    <div class="slab-eyebrow" style="text-align: center; margin-bottom: 32px;">What the founding cohort says</div>
+    <p class="test-quote">We knew our AI bill was growing but had no defensible number to take to the board. AI-VMP found ₹6L in the first sprint and rebuilt our CFO's confidence in our AI programme. This is what FinOps for AI should look like.</p>
+    <div class="test-author">
+      <div class="test-avatar">RM</div>
+      <div class="test-info">
+        <div class="test-name">Rohan M.</div>
+        <div class="test-role">FinOps Lead · Mid-market Indian fintech (founding cohort member)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="slab pricing" id="pricing">
+  <div class="slab-inner">
+    <div style="text-align: center; margin-bottom: 56px;">
+      <div class="slab-eyebrow">Pricing</div>
+      <h2 class="slab-title" style="margin: 0 auto 20px;">Three ways to buy. <em>One way to save.</em></h2>
+      <p class="slab-lead" style="margin: 0 auto;">Start with a free assessment. Expand as you find savings. Only pay when we deliver.</p>
+    </div>
+
+    <div class="price-grid">
+      <!-- Tier 1: Try -->
+      <div class="price-card">
+        <div class="price-tier">Try it</div>
+        <div class="price-name">Assessment</div>
+        <div class="price-desc">One-time diagnostic. See your AI spend by team, feature and provider before you commit to anything.</div>
+        <div class="price-amount">
+          <span class="price-cur">₹</span>
+          <span class="price-num">0</span>
+        </div>
+        <div class="price-note">First 15 enterprises · founding cohort only</div>
+        <button class="btn btn-outline btn-lg price-cta" onclick="openModal('assessment')">Book my free assessment</button>
+        <ul class="price-feats">
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> 14-day diagnostic across all your AI providers</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Board-ready savings estimate</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Read-only setup, no code changes</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Yours to keep, regardless of what happens next</li>
+        </ul>
+      </div>
+
+      <!-- Tier 2: Buy - FEATURED -->
+      <div class="price-card featured">
+        <div class="price-badge">Most popular</div>
+        <div class="price-tier">Buy it</div>
+        <div class="price-name">Platform</div>
+        <div class="price-desc">Continuous cost visibility, waste-detection, and monthly savings reports for one business unit.</div>
+        <div class="price-amount">
+          <span class="price-cur">₹</span>
+          <span class="price-num">1,49,000</span>
+          <span class="price-per">/mo</span>
+        </div>
+        <div class="price-note">Billed annually · up to 5 AI use-cases</div>
+        <button class="btn btn-primary btn-lg price-cta" onclick="openModal('platform')">Start with Platform</button>
+        <ul class="price-feats">
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Everything in Assessment, refreshed daily</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Team-, feature-, and prompt-level attribution</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Weekly waste alerts &amp; ROI simulator</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> CFO/board export in one click</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Dedicated CSM &amp; Slack support</li>
+        </ul>
+      </div>
+
+      <!-- Tier 3: Standardize -->
+      <div class="price-card">
+        <div class="price-tier">Standardise it</div>
+        <div class="price-name">Enterprise</div>
+        <div class="price-desc">Company-wide rollout with custom governance, DPDP data residency, and optional gainshare pricing.</div>
+        <div class="price-amount">
+          <span class="price-cur">₹</span>
+          <span class="price-num">4,99,000</span>
+          <span class="price-per">/mo</span>
+        </div>
+        <div class="price-note">Starting at · gainshare available on LLM spend</div>
+        <button class="btn btn-outline btn-lg price-cta" onclick="openModal('enterprise')">Talk to founders</button>
+        <ul class="price-feats">
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Everything in Platform, no use-case cap</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Custom governance &amp; RBAC per business unit</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> DPDP-aligned data residency, private VPC deploy</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> <b>Gainshare option</b> — pay % of realised savings</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Consulting attach &amp; quarterly executive reviews</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ FINAL CTA ============ -->
+<section class="final">
+  <h2>Every day you wait, <em>your AI bill grows</em>.</h2>
+  <p>Join the founding cohort of 15 Indian enterprises redefining AI FinOps. Free assessment. No commitment. Diagnosis in 14 days.</p>
+  <div class="final-cta">
+    <button class="btn btn-gold btn-lg" onclick="openModal('assessment')">Book my free assessment &nbsp;→</button>
+    <button class="btn btn-outline btn-lg" onclick="openModal('demo')" style="color: white; border-color: rgba(255,255,255,0.35);">Book a live demo</button>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom: 4px;">
+          <div class="logo-mark">V</div>
+          <div class="logo-text">AI<span class="dim" style="color: rgba(255,255,255,0.5);">·</span>VMP</div>
+        </div>
+        <p>The FinOps command centre for enterprise AI. Built in India, for India.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Platform</h5>
+        <ul>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#">Integrations</a></li>
+          <li><a href="#">Security</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Founders' note</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="#">India AI Spend Report</a></li>
+          <li><a href="#">FinOps for AI playbook</a></li>
+          <li><a href="#">Case studies</a></li>
+          <li><a href="#">Docs</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="#">Gurugram, IN</a></li>
+          <li><a href="mailto:hello@ai-vmp.co">hello@ai-vmp.co</a></li>
+          <li><a href="#" onclick="openModal('demo'); return false;">Book a demo</a></li>
+          <li id="viewEntriesLink"><a href="#" onclick="openEntries(); return false;">View demo entries</a></li>
+          <li><a href="#">Partner with us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 AI-VMP Technologies Pvt Ltd · Made in Bengaluru &amp; Gurugram</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">DPDP compliance</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ MODAL (The Smoke-Test "Fake Feature" capture) ============ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+
+    <div id="modalForm">
+      <div class="modal-tag" id="modalTag">Early access</div>
+      <h3 id="modalTitle">You're joining a small group.</h3>
+      <p id="modalDesc">We're currently onboarding the founding cohort of 15 Indian enterprises. Leave your work email and we'll reach out within 24 business hours to schedule your onboarding.</p>
+      <form class="modal-form" onsubmit="submitEmail(event)">
+        <div>
+          <label for="workEmail">Work email</label>
+          <input type="email" id="workEmail" name="workEmail" required placeholder="you@yourcompany.com">
+        </div>
+        <div>
+          <label for="company">Company &amp; role</label>
+          <input type="text" id="company" name="company" placeholder="e.g., Aarav Fintech · FinOps Lead">
+        </div>
+        <button type="submit" class="btn btn-primary modal-submit">Request early access &nbsp;→</button>
+        <div class="form-error" id="formError" role="alert"></div>
+      </form>
+      <div class="modal-note">We'll never share your details. One founder-to-founder email, then it's your call.</div>
+    </div>
+
+    <div id="modalSuccess" style="display: none;" class="modal-success">
+      <div class="modal-success-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+      </div>
+      <h3>You're on the list.</h3>
+      <p>Thanks — we'll be in touch within 24 business hours. In the meantime, keep an eye on your inbox for the India AI Spend Report.</p>
+      <button class="btn btn-outline btn-lg" style="justify-content: center; width: 100%; margin-top: 12px;" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="entriesOverlay">
+  <div class="modal entries-modal">
+    <button class="modal-close" onclick="closeEntries()">×</button>
+    <div class="entries-head">
+      <div>
+        <div class="modal-tag">Local database</div>
+        <h3>Demo request entries</h3>
+      </div>
+      <button class="btn btn-outline" onclick="loadEntries()">Refresh</button>
+    </div>
+    <div class="entries-table-wrap" id="entriesTableWrap">
+      <div class="entries-empty">Loading entries…</div>
+    </div>
+    <div class="modal-note">Entries are stored in the website's local server database.</div>
+  </div>
+</div>
+
+<script>
+  const DB_NAME = 'aivmpWebsite';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'demoRequests';
+  const FALLBACK_STORAGE_KEY = 'aivmpDemoRequests';
+  let activeRequestType = 'access';
+
+  // The entries viewer is a local-development convenience. Production customer
+  // details are available only through the authenticated database console.
+  if (!['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+    document.getElementById('viewEntriesLink')?.remove();
+  }
+
+  function openDatabase() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+          store.createIndex('createdAt', 'createdAt');
+          store.createIndex('email', 'email');
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function saveDemoRequest(entry) {
+    const response = await fetch('/api/demo-requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry)
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      throw new Error(result.error || 'Could not save this request. Please try again.');
+    }
+    return response.json();
+  }
+
+  async function getDemoRequests() {
+    const response = await fetch('/api/demo-requests');
+    if (!response.ok) throw new Error(`Server returned ${response.status}`);
+    return (await response.json()).reverse();
+  }
+
+  // Modal content variants — the smoke-test "fake feature" flow
+  // Every CTA leads to the same email-capture, but with tailored copy
+  const modalContent = {
+    demo:       { tag: 'Live demo', title: "Let's walk through it together.",   desc: "Book a 30-minute demo with a founder. We'll pull up a live AI spend dashboard and walk through the waste-detection engine on real data." },
+    access:     { tag: 'Early access', title: "You're joining a small group.",   desc: "We're currently onboarding the founding cohort of 15 Indian enterprises. Leave your work email and we'll reach out within 24 business hours." },
+    pricing:    { tag: 'Pricing details', title: "We'll send over pricing.",     desc: "Because we're in founding-cohort pricing, we quote directly rather than publishing rates. Leave your work email and you'll get a detailed proposal within a business day." },
+    assessment: { tag: 'Free assessment', title: "Book your free diagnostic.",   desc: "The assessment is limited to the first 15 enterprises in the cohort. Leave your work email and we'll confirm your slot within 24 business hours." },
+    platform:   { tag: 'Platform plan', title: "We're at capacity — for now.",   desc: "Our Platform tier is currently at capacity as we onboard the founding cohort. Leave your work email and we'll reach out the moment a slot opens." },
+    enterprise: { tag: 'Enterprise', title: "Let's set up a call.",              desc: "Enterprise deployments include custom governance, DPDP data residency, and optional gainshare pricing. Leave your details and a founder will reach out." },
+  };
+
+  function openModal(kind) {
+    activeRequestType = kind || 'access';
+    const c = modalContent[kind] || modalContent.access;
+    document.getElementById('modalTag').textContent   = c.tag;
+    document.getElementById('modalTitle').textContent = c.title;
+    document.getElementById('modalDesc').textContent  = c.desc;
+    document.getElementById('modalForm').style.display    = 'block';
+    document.getElementById('modalSuccess').style.display = 'none';
+    document.getElementById('formError').style.display = 'none';
+    document.getElementById('modalOverlay').classList.add('on');
+    document.body.style.overflow = 'hidden';
+
+    // In production, this is where the smoke-test analytics fire:
+    //   trackEvent('cta_click', { variant: kind });
+    console.log('[smoke-test] CTA clicked:', kind);
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('on');
+    document.body.style.overflow = '';
+  }
+
+  async function submitEmail(e) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const email   = document.getElementById('workEmail').value;
+    const company = document.getElementById('company').value;
+    const button = form.querySelector('button[type="submit"]');
+    const error = document.getElementById('formError');
+    button.disabled = true;
+    button.textContent = 'Saving…';
+    error.style.display = 'none';
+
+    try {
+      await saveDemoRequest({ email, company, requestType: activeRequestType, createdAt: new Date().toISOString() });
+      form.reset();
+      document.getElementById('modalForm').style.display = 'none';
+      document.getElementById('modalSuccess').style.display = 'block';
+    } catch (err) {
+      error.textContent = err.message || 'Could not save this request. Please try again.';
+      error.style.display = 'block';
+      console.error('Database save failed:', err);
+    } finally {
+      button.disabled = false;
+      button.innerHTML = 'Request early access &nbsp;→';
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+  }
+
+  async function loadEntries() {
+    const wrap = document.getElementById('entriesTableWrap');
+    wrap.innerHTML = '<div class="entries-empty">Loading entries…</div>';
+    try {
+      const entries = await getDemoRequests();
+      if (!entries.length) {
+        wrap.innerHTML = '<div class="entries-empty">No demo requests have been submitted yet.</div>';
+        return;
+      }
+      wrap.innerHTML = `<table class="entries-table"><thead><tr><th>ID</th><th>Email</th><th>Company &amp; role</th><th>Request type</th><th>Submitted</th></tr></thead><tbody>${entries.map(entry => `<tr><td>${entry.id}</td><td>${escapeHtml(entry.email)}</td><td>${escapeHtml(entry.company || '—')}</td><td>${escapeHtml(entry.requestType)}</td><td>${escapeHtml(new Date(entry.createdAt).toLocaleString())}</td></tr>`).join('')}</tbody></table>`;
+    } catch (err) {
+      wrap.innerHTML = '<div class="entries-empty">Could not read the local database.</div>';
+      console.error('Database read failed:', err);
+    }
+  }
+
+  function openEntries() {
+    document.getElementById('entriesOverlay').classList.add('on');
+    document.body.style.overflow = 'hidden';
+    loadEntries();
+  }
+
+  function closeEntries() {
+    document.getElementById('entriesOverlay').classList.remove('on');
+    document.body.style.overflow = '';
+  }
+
+  // Close on background click
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'modalOverlay') closeModal();
+  });
+  document.getElementById('entriesOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'entriesOverlay') closeEntries();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeModal(); closeEntries(); }
+  });
+</script>
+
+</body>
+</html>
