@@ -1,15 +1,3 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/demo-requests.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/demo-requests",
-      "dest": "/api/demo-requests.py"
-    }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json"
 }
